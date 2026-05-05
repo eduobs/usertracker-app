@@ -1,0 +1,49 @@
+@page
+@model UserTracker.Pages.PortalModel
+@{
+    ViewData["Title"] = "Portal de Acesso";
+    Layout = "_UserLayout";
+}
+
+<div class="min-vh-100 d-flex align-items-center justify-content-center bg-light">
+    <div class="card shadow-sm border-0" style="max-width:420px;width:100%">
+        <div class="card-body p-4 p-md-5 text-center">
+
+            <div class="mb-4">
+                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="48" height="48" rx="12" fill="#4F46E5"/>
+                    <path d="M24 12C17.4 12 12 17.4 12 24s5.4 12 12 12 12-5.4 12-12S30.6 12 24 12zm0 4c2.2 0 4 1.8 4 4s-1.8 4-4 4-4-1.8-4-4 1.8-4 4-4zm0 17c-3 0-5.7-1.5-7.3-3.8.1-2.4 4.9-3.7 7.3-3.7s7.2 1.3 7.3 3.7C29.7 31.5 27 33 24 33z" fill="white"/>
+                </svg>
+            </div>
+
+            <h4 class="fw-semibold mb-1">Bem-vindo</h4>
+            <p class="text-muted mb-4" style="font-size:14px">Faça login para continuar</p>
+
+            <div class="mb-3 text-start">
+                <label class="form-label" style="font-size:13px">E-mail</label>
+                <input type="email" class="form-control" placeholder="seu@email.com" />
+            </div>
+            <div class="mb-4 text-start">
+                <label class="form-label" style="font-size:13px">Senha</label>
+                <input type="password" class="form-control" placeholder="••••••••" />
+            </div>
+
+            <button class="btn btn-primary w-100" id="btn-login">Entrar</button>
+
+            <div id="status-msg" class="mt-3" style="font-size:12px;color:#888;display:none"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+// O fingerprint.js já disparou automaticamente ao carregar a página.
+// Aqui podemos adicionar feedback visual ao usuário após o registro.
+document.getElementById('btn-login').addEventListener('click', function () {
+    const msg = document.getElementById('status-msg');
+    msg.style.display = 'block';
+    msg.textContent = 'Verificando credenciais...';
+    // Aqui você conectaria sua lógica de autenticação real.
+});
+</script>
+}

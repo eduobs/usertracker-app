@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] – UserTracker</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+    <style>
+        body { background: #f4f6f9; font-size: 14px; }
+        .sidebar { min-height: 100vh; background: #1a1d29; color: #cdd; width: 220px; flex-shrink: 0; }
+        .sidebar a { color: #aab; text-decoration: none; padding: 10px 20px; display: block; border-radius: 6px; margin: 2px 10px; }
+        .sidebar a:hover, .sidebar a.active { background: #2e3350; color: #fff; }
+        .sidebar .brand { font-size: 18px; font-weight: 600; color: #fff; padding: 20px; border-bottom: 1px solid #2e3350; margin-bottom: 10px; }
+        .main-content { flex: 1; padding: 24px; overflow-x: auto; }
+        .stat-card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.07); }
+        .stat-card .value { font-size: 32px; font-weight: 600; }
+        .stat-card .label { color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+        .table-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.07); overflow: hidden; }
+        .badge-hash { font-family: monospace; font-size: 11px; background: #e8eaf6; color: #3949ab; padding: 2px 6px; border-radius: 4px; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; }
+        .tag-mobile { background: #fff3e0; color: #e65100; }
+        .tag-desktop { background: #e3f2fd; color: #1565c0; }
+    </style>
+</head>
+<body>
+    <div class="d-flex">
+        <div class="sidebar">
+            <div class="brand"><i class="bi bi-fingerprint me-2"></i>UserTracker</div>
+            <a href="/" class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Index" ? "active" : "")">
+                <i class="bi bi-grid me-2"></i>Dashboard
+            </a>
+            <a href="/accesses" class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Accesses" ? "active" : "")">
+                <i class="bi bi-table me-2"></i>Acessos
+            </a>
+            <a href="/swagger" target="_blank">
+                <i class="bi bi-code-slash me-2"></i>API Docs
+            </a>
+            <div style="border-top:1px solid #2e3350;margin:10px;padding-top:10px">
+                <a href="/portal" target="_blank">
+                    <i class="bi bi-box-arrow-up-right me-2"></i>Página rastreada
+                </a>
+            </div>
+        </div>
+        <div class="main-content">
+            @RenderBody()
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

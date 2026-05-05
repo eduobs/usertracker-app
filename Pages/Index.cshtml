@@ -1,0 +1,103 @@
+@page
+@model UserTracker.Pages.IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="mb-4">
+    <h4 class="fw-semibold mb-0">Dashboard de Acessos</h4>
+    <span class="text-muted" style="font-size:12px;">Monitoramento em tempo real de dispositivos</span>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4" id="stats-row">
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="label">Total de acessos</div><div class="value text-primary" id="st-total">–</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="label">IPs únicos</div><div class="value text-success" id="st-ips">–</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="label">Fingerprints únicos</div><div class="value text-warning" id="st-fp">–</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="label">Acessos hoje</div><div class="value text-danger" id="st-today">–</div></div></div>
+</div>
+
+<div class="row g-3 mb-4">
+    <!-- Top IPs -->
+    <div class="col-md-4">
+        <div class="table-card p-3">
+            <div class="fw-semibold mb-3">Top IPs</div>
+            <table class="table table-sm mb-0" id="tbl-ips"></table>
+        </div>
+    </div>
+    <!-- Top Browsers -->
+    <div class="col-md-4">
+        <div class="table-card p-3">
+            <div class="fw-semibold mb-3">Navegadores</div>
+            <table class="table table-sm mb-0" id="tbl-browsers"></table>
+        </div>
+    </div>
+    <!-- Top OS -->
+    <div class="col-md-4">
+        <div class="table-card p-3">
+            <div class="fw-semibold mb-3">Sistemas Operacionais</div>
+            <table class="table table-sm mb-0" id="tbl-os"></table>
+        </div>
+    </div>
+</div>
+
+<!-- Últimos acessos -->
+<div class="table-card">
+    <div class="p-3 border-bottom d-flex align-items-center justify-content-between">
+        <span class="fw-semibold">Últimos acessos</span>
+        <a href="/accesses" class="btn btn-sm btn-outline-primary">Ver todos</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0" id="tbl-recent">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th><th>Quando</th><th>IP</th><th>Navegador</th><th>OS</th><th>Dispositivo</th><th>Fingerprint</th><th></th>
+                </tr>
+            </thead>
+            <tbody id="tbl-recent-body"></tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+async function loadStats() {
+    const r = await fetch('/api/tracking/stats');
+    const d = await r.json();
+    document.getElementById('st-total').textContent  = d.total.toLocaleString();
+    document.getElementById('st-ips').textContent    = d.uniqueIps.toLocaleString();
+    document.getElementById('st-fp').textContent     = d.uniqueFingerprints.toLocaleString();
+    document.getElementById('st-today').textContent  = d.today.toLocaleString();
+
+    document.getElementById('tbl-ips').innerHTML = d.topIps.map(x =>
+        `<tr><td>${x.ip}</td><td class="text-end text-muted">${x.count}</td></tr>`).join('');
+
+    document.getElementById('tbl-browsers').innerHTML = d.topBrowsers.map(x =>
+        `<tr><td>${x.browser}</td><td class="text-end text-muted">${x.count}</td></tr>`).join('');
+
+    document.getElementById('tbl-os').innerHTML = d.topOs.map(x =>
+        `<tr><td>${x.os}</td><td class="text-end text-muted">${x.count}</td></tr>`).join('');
+}
+
+async function loadRecent() {
+    const r = await fetch('/api/tracking/accesses?size=10');
+    const d = await r.json();
+    const tbody = document.getElementById('tbl-recent-body');
+    tbody.innerHTML = d.items.map(item => `
+        <tr>
+            <td class="text-muted">${item.id}</td>
+            <td>${new Date(item.accessedAt).toLocaleString('pt-BR')}</td>
+            <td><code>${item.ipAddress}</code></td>
+            <td>${item.browserFamily ?? '–'} ${item.browserVersion ?? ''}</td>
+            <td>${item.osFamily ?? '–'} ${item.osVersion ?? ''}</td>
+            <td><span class="tag ${item.isMobile ? 'tag-mobile' : 'tag-desktop'}">${item.isMobile ? '📱 Mobile' : '🖥️ Desktop'}</span></td>
+            <td><span class="badge-hash">${(item.fingerprintHash || '').slice(0, 16)}…</span></td>
+            <td><a href="/accesses/${item.id}" class="btn btn-xs btn-outline-secondary btn-sm py-0">ver</a></td>
+        </tr>`).join('');
+}
+
+loadStats();
+loadRecent();
+setInterval(() => { loadStats(); loadRecent(); }, 15000);
+</script>
+}

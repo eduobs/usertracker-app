@@ -1,0 +1,102 @@
+@page
+@model UserTracker.Pages.AccessesModel
+@{
+    ViewData["Title"] = "Acessos";
+}
+
+<div class="mb-4 d-flex align-items-center justify-content-between">
+    <div>
+        <h4 class="fw-semibold mb-0">Todos os Acessos</h4>
+        <span class="text-muted" style="font-size:12px;">Histórico completo de dispositivos rastreados</span>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="table-card p-3 mb-3 d-flex gap-2 flex-wrap">
+    <input type="text" id="filter-ip" class="form-control form-control-sm" style="max-width:180px" placeholder="Filtrar por IP" />
+    <input type="text" id="filter-hash" class="form-control form-control-sm" style="max-width:280px" placeholder="Filtrar por fingerprint hash" />
+    <button class="btn btn-sm btn-primary" onclick="loadPage(1)">Filtrar</button>
+    <button class="btn btn-sm btn-outline-secondary" onclick="clearFilters()">Limpar</button>
+</div>
+
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Data/Hora</th>
+                    <th>IP</th>
+                    <th>Navegador</th>
+                    <th>OS</th>
+                    <th>Dispositivo</th>
+                    <th>Tela</th>
+                    <th>Timezone</th>
+                    <th>Fingerprint</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="accesses-body"></tbody>
+        </table>
+    </div>
+    <div class="p-3 d-flex align-items-center justify-content-between border-top">
+        <span class="text-muted" id="page-info"></span>
+        <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-secondary" id="btn-prev" onclick="changePage(-1)">← Anterior</button>
+            <button class="btn btn-sm btn-outline-secondary" id="btn-next" onclick="changePage(1)">Próxima →</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+let currentPage = 1;
+const pageSize = 20;
+
+async function loadPage(page) {
+    currentPage = page;
+    const ip = document.getElementById('filter-ip').value;
+    const hash = document.getElementById('filter-hash').value;
+    const params = new URLSearchParams({ page, size: pageSize });
+    if (ip) params.set('ip', ip);
+    if (hash) params.set('hash', hash);
+
+    const r = await fetch('/api/tracking/accesses?' + params);
+    const d = await r.json();
+
+    const totalPages = Math.ceil(d.total / pageSize);
+    document.getElementById('page-info').textContent =
+        `Página ${page} de ${totalPages} (${d.total.toLocaleString()} registros)`;
+    document.getElementById('btn-prev').disabled = page <= 1;
+    document.getElementById('btn-next').disabled = page >= totalPages;
+
+    document.getElementById('accesses-body').innerHTML = d.items.map(item => `
+        <tr>
+            <td class="text-muted">${item.id}</td>
+            <td style="white-space:nowrap">${new Date(item.accessedAt).toLocaleString('pt-BR')}</td>
+            <td><code>${item.ipAddress}</code></td>
+            <td>${item.browserFamily ?? '–'} ${item.browserVersion ?? ''}</td>
+            <td>${item.osFamily ?? '–'}</td>
+            <td><span class="tag ${item.isMobile ? 'tag-mobile' : 'tag-desktop'}">${item.isMobile ? '📱' : '🖥️'} ${item.deviceFamily ?? ''}</span></td>
+            <td style="white-space:nowrap">${item.screenWidth ?? '–'}×${item.screenHeight ?? '–'}</td>
+            <td style="font-size:12px">${item.timezone ?? '–'}</td>
+            <td><span class="badge-hash">${(item.fingerprintHash || '').slice(0, 14)}…</span></td>
+            <td>
+                <a href="/accesses/${item.id}" class="btn btn-sm btn-outline-primary py-0">ver</a>
+            </td>
+        </tr>`).join('') || '<tr><td colspan="10" class="text-center text-muted py-3">Nenhum registro encontrado.</td></tr>';
+}
+
+function changePage(delta) {
+    loadPage(currentPage + delta);
+}
+
+function clearFilters() {
+    document.getElementById('filter-ip').value = '';
+    document.getElementById('filter-hash').value = '';
+    loadPage(1);
+}
+
+loadPage(1);
+</script>
+}

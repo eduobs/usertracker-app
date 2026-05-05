@@ -1,0 +1,127 @@
+@page "/accesses/{id:int}"
+@model UserTracker.Pages.AccessDetailModel
+@{
+    ViewData["Title"] = $"Acesso #{Model.AccessId}";
+}
+
+<div class="mb-4 d-flex align-items-center justify-content-between">
+    <div>
+        <a href="/accesses" class="text-muted text-decoration-none" style="font-size:13px">← Voltar</a>
+        <h4 class="fw-semibold mb-0 mt-1">Detalhe do Acesso <span class="text-muted">#<span id="acc-id">@Model.AccessId</span></span></h4>
+    </div>
+    <button class="btn btn-sm btn-outline-danger" onclick="deleteAccess()">Excluir registro</button>
+</div>
+
+<div id="detail-root"></div>
+
+@section Scripts {
+<script>
+const accessId = @Model.AccessId;
+
+function section(title, rows) {
+    const inner = rows.map(([k,v]) => `
+        <div class="d-flex border-bottom py-2" style="gap:16px">
+            <div style="min-width:220px;color:#888;font-size:13px">${k}</div>
+            <div style="font-size:13px;word-break:break-all">${v ?? '<i style="color:#ccc">N/D</i>'}</div>
+        </div>`).join('');
+    return `
+        <div class="table-card mb-3">
+            <div class="p-3 border-bottom fw-semibold" style="font-size:13px;background:#fafafa">${title}</div>
+            <div class="p-3">${inner}</div>
+        </div>`;
+}
+
+function bool(v) {
+    if (v === null || v === undefined) return null;
+    return v ? '<span class="text-success">✓ Sim</span>' : '<span class="text-danger">✗ Não</span>';
+}
+
+async function load() {
+    const r = await fetch(`/api/tracking/accesses/${accessId}`);
+    if (!r.ok) { document.getElementById('detail-root').innerHTML = '<div class="alert alert-danger">Acesso não encontrado.</div>'; return; }
+    const d = await r.json();
+
+    document.getElementById('detail-root').innerHTML =
+        section('🔑 Identificação', [
+            ['ID do acesso',         d.id],
+            ['Session ID',           `<code>${d.sessionId}</code>`],
+            ['Fingerprint Hash',     `<code>${d.fingerprintHash}</code>`],
+            ['Data/Hora (UTC)',       new Date(d.accessedAt).toLocaleString('pt-BR')],
+        ]) +
+        section('🌐 Rede', [
+            ['IP Address',           `<strong>${d.ipAddress}</strong>`],
+            ['X-Forwarded-For',      d.forwardedFor],
+            ['X-Real-IP',            d.realIp],
+        ]) +
+        section('📋 Headers HTTP (servidor)', [
+            ['User-Agent',           `<span style="font-size:11px;font-family:monospace">${d.userAgent}</span>`],
+            ['Accept-Language',      d.acceptLanguage],
+            ['Accept-Encoding',      d.acceptEncoding],
+            ['Referer',              d.referer],
+            ['Origin',               d.origin],
+            ['Host',                 d.host],
+            ['Connection',           d.connection],
+            ['Cache-Control',        d.cacheControl],
+            ['DNT',                  d.dnt],
+            ['Sec-CH-UA',            d.secChUa],
+            ['Sec-CH-UA-Mobile',     d.secChUaMobile],
+            ['Sec-CH-UA-Platform',   d.secChUaPlatform],
+            ['Sec-Fetch-Site',       d.secFetchSite],
+            ['Sec-Fetch-Mode',       d.secFetchMode],
+            ['Sec-Fetch-Dest',       d.secFetchDest],
+        ]) +
+        section('🖥️ Dispositivo (User-Agent parseado)', [
+            ['Navegador',            `${d.browserFamily ?? '–'} ${d.browserVersion ?? ''}`],
+            ['Sistema Operacional',  `${d.osFamily ?? '–'} ${d.osVersion ?? ''}`],
+            ['Família do dispositivo', d.deviceFamily],
+            ['É mobile',             bool(d.isMobile)],
+        ]) +
+        section('🌍 Navegador (JavaScript)', [
+            ['Idioma principal',     d.browserLanguage],
+            ['Idiomas',              d.browserLanguages],
+            ['Plataforma (JS)',      d.platform],
+            ['Timezone',             d.timezone],
+            ['Offset UTC (min)',     d.timezoneOffset],
+            ['Cookies habilitados',  bool(d.cookiesEnabled)],
+            ['Plugins',              d.pluginsList],
+        ]) +
+        section('📐 Tela e Hardware', [
+            ['Resolução',            d.screenWidth && d.screenHeight ? `${d.screenWidth} × ${d.screenHeight} px` : null],
+            ['Área disponível',      d.availWidth && d.availHeight ? `${d.availWidth} × ${d.availHeight} px` : null],
+            ['Profundidade de cor',  d.colorDepth ? `${d.colorDepth} bits` : null],
+            ['Device Pixel Ratio',   d.pixelRatio],
+            ['CPU threads',          d.hardwareConcurrency],
+            ['Memória RAM',          d.deviceMemoryGb ? `${d.deviceMemoryGb} GB` : null],
+            ['Touch points',         d.maxTouchPoints],
+        ]) +
+        section('⚙️ Capacidades', [
+            ['localStorage',         bool(d.localStorageAvailable)],
+            ['sessionStorage',       bool(d.sessionStorageAvailable)],
+            ['IndexedDB',            bool(d.indexedDbAvailable)],
+            ['WebRTC',               bool(d.webRtcAvailable)],
+            ['Tipo de conexão',      d.connectionType],
+            ['Velocidade (Mbps)',     d.connectionDownlink],
+        ]) +
+        section('🎨 Canvas / WebGL Fingerprint', [
+            ['Canvas Hash',          `<code style="font-size:11px">${d.canvasHash}</code>`],
+            ['WebGL Vendor',         d.webGlVendor],
+            ['WebGL Renderer',       d.webGlRenderer],
+            ['WebGL Version',        d.webGlVersion],
+        ]) +
+        section('📡 Requisição', [
+            ['Path',                 d.requestPath],
+            ['Método',               d.requestMethod],
+            ['Query String',         d.queryString],
+            ['Protocolo',            d.protocol],
+        ]);
+}
+
+async function deleteAccess() {
+    if (!confirm('Excluir este registro de acesso?')) return;
+    await fetch(`/api/tracking/accesses/${accessId}`, { method: 'DELETE' });
+    window.location.href = '/accesses';
+}
+
+load();
+</script>
+}
