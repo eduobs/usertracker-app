@@ -90,25 +90,3 @@ UserTracker/
 | GET | `/api/tracking/accesses/{id}` | Detalhe de um acesso |
 | DELETE | `/api/tracking/accesses/{id}` | Remove um acesso |
 | GET | `/api/tracking/stats` | Estatísticas gerais |
-
----
-
-## ⚠️ Por que não tem MAC Address?
-
-O MAC Address **não é transmitido** em requisições HTTP/HTTPS — ele opera na camada
-de rede local (Layer 2 / Ethernet) e nunca chega ao servidor web.
-
-Para capturar o MAC, seria necessário um **agente/software instalado** na máquina
-do usuário (ex: aplicação desktop, extensão de browser com permissões elevadas,
-ou acesso direto à rede via ARP em ambiente corporativo).
-
----
-
-## 🔒 Sobre privacidade e LGPD
-
-Este sistema coleta dados de identificação de dispositivos.
-Em produção, certifique-se de:
-- Ter base legal para o tratamento (LGPD, Art. 7º)
-- Informar os usuários via Política de Privacidade
-- Implementar mecanismo de consentimento se necessário
-- Definir prazo de retenção e exclusão dos dados
