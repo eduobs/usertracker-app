@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.HttpOverrides;
 using UserTracker.Data;
 using UserTracker.Services;
 using System.Runtime.InteropServices;
@@ -17,6 +18,14 @@ if (Directory.Exists(webRoot))
 builder.Services.AddRazorPages();
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
+
+// Configure Forwarded Headers for Azure App Service (Linux reverse proxy)
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 builder.Services.AddAuthentication(options =>
 {
@@ -102,6 +111,8 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "UserTracker API v1");
     c.RoutePrefix = "swagger";
 });
+
+app.UseForwardedHeaders();
 
 app.UseStaticFiles();
 app.UseRouting();
