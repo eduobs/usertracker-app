@@ -1,0 +1,25 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Projetos\\Eng3W\\UserTracker\\wwwroot\\js\\fingerprint.js",
+      "PackagePath": "staticwebassets\\js\\fingerprint.js"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.UserTracker.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.UserTracker.props",
+      "PackagePath": "build\\UserTracker.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.UserTracker.props",
+      "PackagePath": "buildMultiTargeting\\UserTracker.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.UserTracker.props",
+      "PackagePath": "buildTransitive\\UserTracker.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

@@ -13,15 +13,23 @@ Combina dados do **servidor** (headers HTTP) com dados do **cliente** (JavaScrip
 
 ## 🚀 Como rodar
 
+> **Nota sobre Login (User Secrets)**: Caso você não possua as credenciais do Google (`ClientId` e `ClientSecret`), consulte o [guia detalhado de configuração do Google Auth](docs/google_auth_setup.md).
+
 ```bash
 # 1. Restaurar dependências
 dotnet restore
 
-# 2. Executar (o banco SQLite é criado automaticamente)
+# 2. Configurar credenciais do Google para o Login
+dotnet user-secrets init
+dotnet user-secrets set "Authentication:Google:ClientId" "COLOQUE_SEU_CLIENT_ID_AQUI"
+dotnet user-secrets set "Authentication:Google:ClientSecret" "COLOQUE_SEU_CLIENT_SECRET_AQUI"
+
+# 3. Executar (o banco SQLite é criado automaticamente)
 dotnet run
 
-# 3. Acessar no navegador
-# Dashboard: http://localhost:5000
+# 4. Acessar no navegador
+# Portal:    http://localhost:5000/
+# Dashboard: http://localhost:5000/dashboard
 # API Docs:  http://localhost:5000/swagger
 ```
 

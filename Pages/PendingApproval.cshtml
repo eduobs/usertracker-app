@@ -1,0 +1,25 @@
+@page "/pending"
+@model UserTracker.Pages.PendingApprovalModel
+@{
+    ViewData["Title"] = "Aprovação Pendente";
+    Layout = "_UserLayout"; // same layout as portal
+}
+
+<div class="min-vh-100 d-flex align-items-center justify-content-center bg-light">
+    <div class="card shadow-sm border-0" style="max-width:420px;width:100%">
+        <div class="card-body p-4 p-md-5 text-center">
+
+            <div class="mb-4">
+                <i class="bi bi-hourglass-split" style="font-size: 48px; color: #f59e0b;"></i>
+            </div>
+
+            <h4 class="fw-semibold mb-3">Aprovação Pendente</h4>
+            <p class="text-muted mb-4" style="font-size:14px">
+                Sua conta foi criada com sucesso, mas você ainda não tem permissão para acessar o dashboard. 
+                Aguarde um administrador aprovar seu acesso.
+            </p>
+
+            <a href="/logout" class="btn btn-outline-secondary w-100">Sair</a>
+        </div>
+    </div>
+</div>

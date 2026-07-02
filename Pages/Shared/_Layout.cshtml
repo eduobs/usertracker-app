@@ -27,20 +27,33 @@
     <div class="d-flex">
         <div class="sidebar">
             <div class="brand"><i class="bi bi-fingerprint me-2"></i>UserTracker</div>
-            <a href="/" class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Index" ? "active" : "")">
+            <a href="/dashboard" class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Index" ? "active" : "")">
                 <i class="bi bi-grid me-2"></i>Dashboard
             </a>
             <a href="/accesses" class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Accesses" ? "active" : "")">
                 <i class="bi bi-table me-2"></i>Acessos
             </a>
+            @if(User.IsInRole("Admin"))
+            {
+                <a href="/dashboard/users" class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Users" ? "active" : "")">
+                    <i class="bi bi-people me-2"></i>Usuários
+                </a>
+            }
             <a href="/swagger" target="_blank">
                 <i class="bi bi-code-slash me-2"></i>API Docs
             </a>
             <div style="border-top:1px solid #2e3350;margin:10px;padding-top:10px">
-                <a href="/portal" target="_blank">
+                <a href="/" target="_blank">
                     <i class="bi bi-box-arrow-up-right me-2"></i>Página rastreada
                 </a>
             </div>
+            @if(User.Identity?.IsAuthenticated == true)
+            {
+                <div style="border-top:1px solid #2e3350;margin:10px;padding-top:10px;text-align:center">
+                    <div class="mb-2 text-white" style="font-size:12px;">@User.Identity.Name</div>
+                    <a href="/logout" class="btn btn-sm btn-outline-light w-100" style="padding: 4px;font-size:12px;margin:0;">Sair</a>
+                </div>
+            }
         </div>
         <div class="main-content">
             @RenderBody()

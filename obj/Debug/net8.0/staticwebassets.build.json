@@ -1,0 +1,39 @@
+{
+  "Version": 1,
+  "Hash": "n1OQFdmpC9jozYDP4duwEMgGUo3CPlA94ST1u57iab0=",
+  "Source": "UserTracker",
+  "BasePath": "_content/UserTracker",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "UserTracker\\wwwroot",
+      "Source": "UserTracker",
+      "ContentRoot": "C:\\Projetos\\Eng3W\\UserTracker\\wwwroot\\",
+      "BasePath": "_content/UserTracker",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "C:\\Projetos\\Eng3W\\UserTracker\\wwwroot\\js\\fingerprint.js",
+      "SourceId": "UserTracker",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Projetos\\Eng3W\\UserTracker\\wwwroot\\",
+      "BasePath": "_content/UserTracker",
+      "RelativePath": "js/fingerprint.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\fingerprint.js"
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using UserTracker.Data;
 using UserTracker.Models;
 using UserTracker.Services;
@@ -8,6 +9,7 @@ namespace UserTracker.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Policy = "ApprovedUser")]
 public class TrackingController : ControllerBase
 {
     private readonly AppDbContext _db;
@@ -23,6 +25,7 @@ public class TrackingController : ControllerBase
     /// Recebe o fingerprint coletado pelo JavaScript e mescla com dados do servidor.
     /// </summary>
     [HttpPost("collect")]
+    [AllowAnonymous]
     public async Task<IActionResult> Collect([FromBody] ClientFingerprintDto dto)
     {
         // Monta base com dados do servidor (headers, IP, UA parseado...)
@@ -137,11 +140,26 @@ public class TrackingController : ControllerBase
     /// Deleta um registro de acesso.
     /// </summary>
     [HttpDelete("accesses/{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id)
     {
         var access = await _db.UserAccesses.FindAsync(id);
         if (access is null) return NotFound();
         _db.UserAccesses.Remove(access);
+        await _db.SaveChangesAsync();
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Deleta múltiplos registros de acesso de uma vez.
+    /// </summary>
+    [HttpPost("accesses/batch-delete")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> BatchDelete([FromBody] List<int> ids)
+    {
+        if (ids == null || !ids.Any()) return BadRequest();
+        var accesses = await _db.UserAccesses.Where(x => ids.Contains(x.Id)).ToListAsync();
+        _db.UserAccesses.RemoveRange(accesses);
         await _db.SaveChangesAsync();
         return NoContent();
     }
