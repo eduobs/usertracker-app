@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.DataProtection;
 using UserTracker.Data;
 using UserTracker.Services;
 using System.Runtime.InteropServices;
@@ -13,6 +14,17 @@ if (Directory.Exists(webRoot))
 {
     builder.Environment.WebRootPath = webRoot;
 }
+
+// Data Protection (Essencial para OAuth no Azure Linux)
+var keysFolder = Path.Combine(contentRoot, "Data", "Keys");
+if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && Directory.Exists("/home"))
+{
+    keysFolder = "/home/DataProtection-Keys";
+}
+Directory.CreateDirectory(keysFolder);
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(keysFolder))
+    .SetApplicationName("UserTracker");
 
 // --- Services ---
 builder.Services.AddRazorPages();
@@ -63,6 +75,16 @@ builder.Services.AddAuthentication(options =>
     options.SignInScheme = "ExternalCookie";
     options.ClientId = builder.Configuration["Authentication:Google:ClientId"] ?? "placeholder-client-id";
     options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"] ?? "placeholder-client-secret";
+    
+    options.Events.OnRemoteFailure = context =>
+    {
+        var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+        logger.LogError(context.Failure, "Falha na Autenticação Remota com o Google.");
+        
+        context.Response.Redirect("/login?error=" + Uri.EscapeDataString(context.Failure?.Message ?? "Erro desconhecido"));
+        context.HandleResponse();
+        return Task.CompletedTask;
+    };
 });
 
 builder.Services.AddAuthorization(options =>

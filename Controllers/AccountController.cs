@@ -20,8 +20,13 @@ public class AccountController : Controller
     }
 
     [HttpGet("/login")]
-    public IActionResult Login(string returnUrl = "/dashboard")
+    public IActionResult Login(string returnUrl = "/dashboard", string? error = null)
     {
+        if (!string.IsNullOrEmpty(error))
+        {
+            return Content($"Erro na Autenticação com o Google: {error}", "text/plain; charset=utf-8");
+        }
+
         var callbackUrl = $"/login-callback?returnUrl={Uri.EscapeDataString(returnUrl)}";
         var properties = new AuthenticationProperties { RedirectUri = callbackUrl };
         return Challenge(properties, GoogleDefaults.AuthenticationScheme);
