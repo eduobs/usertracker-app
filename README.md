@@ -35,6 +35,13 @@ dotnet run
 
 ---
 
+## ⚙️ Deploy Automático (CI/CD)
+
+Este repositório possui uma esteira configurada com GitHub Actions para deploy automático no Azure App Service.
+Para aprender a autorizar o GitHub a publicar no Azure e como proteger as variáveis de ambiente (Secrets), consulte o [Guia de Configuração de CI/CD e Secrets](docs/cicd_azure_setup.md).
+
+---
+
 ## 📦 O que é coletado
 
 ### Via servidor (headers HTTP)
