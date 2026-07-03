@@ -150,6 +150,21 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.EnsureCreated();
+
+    // Cria a tabela Users manualmente caso o banco de dados já existisse 
+    // antes da implementação do sistema de Login
+    db.Database.ExecuteSqlRaw(@"
+        CREATE TABLE IF NOT EXISTS ""Users"" (
+            ""Id"" TEXT NOT NULL CONSTRAINT ""PK_Users"" PRIMARY KEY,
+            ""GoogleSubjectId"" TEXT NOT NULL,
+            ""Email"" TEXT NOT NULL,
+            ""Name"" TEXT NOT NULL,
+            ""Role"" INTEGER NOT NULL,
+            ""IsApproved"" INTEGER NOT NULL,
+            ""CreatedAt"" TEXT NOT NULL
+        );
+        CREATE UNIQUE INDEX IF NOT EXISTS ""IX_Users_Email"" ON ""Users"" (""Email"");
+    ");
 }
 
 app.Run();
