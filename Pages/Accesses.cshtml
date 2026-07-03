@@ -64,6 +64,7 @@
 <script>
 let currentPage = 1;
 const pageSize = 20;
+let currentItems = [];
 
 async function loadPage(page) {
     currentPage = page;
@@ -75,6 +76,7 @@ async function loadPage(page) {
 
     const r = await fetch('/api/tracking/accesses?' + params);
     const d = await r.json();
+    currentItems = d.items;
 
     const totalPages = Math.ceil(d.total / pageSize);
     document.getElementById('page-info').textContent =
@@ -159,20 +161,18 @@ async function deleteSelected() {
 }
 
 async function exportToJson() {
-    const ip = document.getElementById('filter-ip').value;
-    const hash = document.getElementById('filter-hash').value;
-    const params = new URLSearchParams({ page: 1, size: 100000 }); // Busca um número alto para pegar todos os filtrados
-    if (ip) params.set('ip', ip);
-    if (hash) params.set('hash', hash);
+    const checked = document.querySelectorAll('.chk-item:checked');
+    if (checked.length === 0) {
+        alert('Por favor, selecione os registros que deseja exportar.');
+        return;
+    }
+    
+    const ids = Array.from(checked).map(chk => parseInt(chk.value));
+    const dataToExport = currentItems.filter(item => ids.includes(item.id));
 
     try {
-        const response = await fetch('/api/tracking/accesses?' + params);
-        if (!response.ok) throw new Error('Erro na requisição');
-        
-        const data = await response.json();
-        
-        // Formata os dados para o JSON de forma legível
-        const jsonStr = JSON.stringify(data.items, null, 2);
+        // Formata os dados selecionados para o JSON de forma legível
+        const jsonStr = JSON.stringify(dataToExport, null, 2);
         
         // Cria um "arquivo virtual" com o texto
         const blob = new Blob([jsonStr], { type: "application/json" });
@@ -181,7 +181,7 @@ async function exportToJson() {
         // Dispara o download criando um link invisível
         const a = document.createElement('a');
         a.href = url;
-        a.download = `analise_acessos_${new Date().toISOString().slice(0,10)}.json`;
+        a.download = `selecionados_acessos_${new Date().toISOString().slice(0,10)}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
