@@ -20,7 +20,10 @@
     <input type="text" id="filter-hash" class="form-control form-control-sm" style="max-width:280px" placeholder="Filtrar por fingerprint hash" />
     <button class="btn btn-sm btn-primary" onclick="loadPage(1)">Filtrar</button>
     <button class="btn btn-sm btn-outline-secondary" onclick="clearFilters()">Limpar</button>
-    <div class="ms-auto">
+    <div class="ms-auto d-flex gap-2">
+        <button class="btn btn-sm btn-success" onclick="exportToJson()">
+            <i class="bi bi-download"></i> Exportar JSON
+        </button>
         <button class="btn btn-sm btn-danger d-none" id="btn-delete-selected" onclick="deleteSelected()">
             <i class="bi bi-trash"></i> Excluir Selecionados
         </button>
@@ -152,6 +155,40 @@ async function deleteSelected() {
         loadPage(currentPage);
     } else {
         alert('Erro ao excluir os registros.');
+    }
+}
+
+async function exportToJson() {
+    const ip = document.getElementById('filter-ip').value;
+    const hash = document.getElementById('filter-hash').value;
+    const params = new URLSearchParams({ page: 1, size: 100000 }); // Busca um número alto para pegar todos os filtrados
+    if (ip) params.set('ip', ip);
+    if (hash) params.set('hash', hash);
+
+    try {
+        const response = await fetch('/api/tracking/accesses?' + params);
+        if (!response.ok) throw new Error('Erro na requisição');
+        
+        const data = await response.json();
+        
+        // Formata os dados para o JSON de forma legível
+        const jsonStr = JSON.stringify(data.items, null, 2);
+        
+        // Cria um "arquivo virtual" com o texto
+        const blob = new Blob([jsonStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        
+        // Dispara o download criando um link invisível
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `analise_acessos_${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } catch (e) {
+        alert("Erro ao exportar dados.");
+        console.error(e);
     }
 }
 
